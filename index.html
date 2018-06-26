@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+		<style type="text/css">
+			[v-cloak] {display: none;}
+			table {border-collapse: collapse;border-spacing: 0;empty-cells: show;background: deepskyblue;}
+			th,td {padding: 8px 16px;border: 1px solid #fff;text-align: center;color: #FFFFFF;}
+			th {background-color: deeppink;color: #fff;}
+		</style>
+	</head>
+
+	<body>
+		<div id="app" v-cloak>
+
+			<template v-if="list.length">
+
+				<table>
+
+					<thead>
+
+						<tr>
+
+							<th><input type="checkbox" v-on:click="swapCheck" v-model="checked"></th>
+
+							<th>商品名称</th>
+
+							<th>商品单价</th>
+
+							<th>商品数量</th>
+
+							<th>操作</th>
+						</tr>
+					</thead>
+
+					<tbody>
+
+						<tr v-for="(item,index) in list">
+
+							<td><input type="checkbox" v-model="selectList" :id="item.id" :value="index" name="selectList"></td>
+
+							<td>{{ item.name }}</td>
+
+							<td>{{ item.price }}</td>
+
+							<td>
+								<button @click="handleReduce(index)" :disabled="item.count === 1">-</button> {{ item.count }}
+								<button @click="handleAdd(index)">+</button>
+							</td>
+
+							<td><button @click="handleRemove(index)">删除</button></td>
+						</tr>
+						<tr>
+							<td colspan="5" style="text-align: right;">合计：￥ {{ totalPrice }} 元</td>
+						</tr>
+					</tbody>
+				</table>
+				<br/>
+				
+			</template>
+
+			<div v-else>购物车为空！</div>
+		</div>
+		<script type="text/javascript">
+			var app = new Vue({
+				el: '#app',
+				data: {
+					list: [{
+							id: 1,
+							name: 'iphone 8',
+							price: 5688,
+							count: 1
+						},
+						{
+							id: 2,
+							name: 'iphone 9',
+							price: 6688,
+							count: 1
+						},
+						{
+							id: 3,
+							name: 'iphone 10',
+							price: 8688,
+							count: 1
+						}
+					],
+					selectList: [],
+					checked: false
+				},
+				computed: {
+					totalPrice: function() {
+						var total = 0;
+						for(var i = 0, len = this.selectList.length; i < len; i++) {
+							var index = this.selectList[i];
+							var item = this.list[index];
+							if(item) {
+								total += item.price * item.count;
+							} else {
+								continue;
+							}
+
+						}
+						return total.toString().replace(/\B(?=(\d{3})+$)/g, ',');
+					}
+				},
+				methods: {
+					handleReduce: function(index) {
+						var item = this.list[index];
+						if(item.count < 2) {
+							return;
+						}
+						item.count--;
+					},
+					handleAdd: function(index) {
+						var item = this.list[index];
+						item.count++;
+					},
+					handleRemove: function(index) {
+						this.list.splice(index, 1);
+					},
+					swapCheck: function() {
+
+						var selectList = document.getElementsByName('selectList');
+						var len = selectList.length;
+						if(this.checked) {
+							for(var i = 0; i < len; i++) {
+								var item = selectList[i];
+								item.checked = false;
+							}
+							this.checked = false;
+							this.selectList = [];
+						} else {
+							for(i = 0; i < len; i++) {
+								item = selectList[i];
+								if(item.checked === false) {
+									item.checked = true;
+									this.selectList.push(selectList[i].value);
+								}
+							}
+							this.checked = true;
+
+						}
+					}
+				}
+			});
+		</script>
+	</body>
+
+</html>
